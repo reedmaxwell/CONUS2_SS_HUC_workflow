@@ -4,9 +4,13 @@
 ! simulate age, diagnosing travel times, source water composition and
 ! flowpaths.  It integrates seamlessly with **ParFlow-CLM**.
 !
-! Developed by: Reed Maxwell-August 2016 (rmaxwell@mines.edu)
+! **Note** This EcoSLIM.f90 file is designed to be used with the reverse particle tracking
+! workflow only.  It is modified for the test cases in this repo and is not intended 
+! for use with the "regular" EcoSLIM
 !
-! Contributors: Laura Condon (lecondon@email.arizona.edu)
+! Developed by: Reed Maxwell-August 2016, updated October 2024 (reedmaxwell@princeton.edu)
+!
+! Contributors: Laura Condon (lecondon@arizona.edu)
 !               Mohammad Danesh-Yazdi (danesh@sharif.edu)
 !               Lindsay Bearup (lbearup@usbr.gov)
 !               Zach Perzan (zperzan@stanford.edu)
