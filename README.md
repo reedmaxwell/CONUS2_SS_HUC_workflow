@@ -8,3 +8,4 @@ This workflow contains Juypyter notebooks for using [SubsetTools](https://hydrof
 4. then use `make_sat_vtk.0205.dist.tcl` to create 3D VTKs of your streams, DEM, mask and some model outputs
 5. build a custom version of EcoSLIM with the `EcoSLIM.f90` file provided here.  This workflow will not work with the default version of EcoSLIM
 6. then use the workbook `run_EcoSLIM.0205.dist.ipynb` to run EcoSLIM and analyze the output.  Some sample analysis cells are provided.
+7. the workbook `Read_wells_convert_CONS2_inputs.0205.dist.ipynb` is an example of how to turn the EOG wells database into a EcoSLIM input file for CONUS2, HUC0205
