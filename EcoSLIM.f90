@@ -10,7 +10,8 @@
 !
 ! Developed by: Reed Maxwell-August 2016, updated October 2024 (reedmaxwell@princeton.edu)
 !
-! Contributors: Laura Condon (lecondon@arizona.edu)
+!
+! Contributors: Laura Condon (lecondon@email.arizona.edu)
 !               Mohammad Danesh-Yazdi (danesh@sharif.edu)
 !               Lindsay Bearup (lbearup@usbr.gov)
 !               Zach Perzan (zperzan@stanford.edu)
@@ -417,6 +418,10 @@ write(11,*) 'Not reading ParFlow DEM'
 end if
 write(11,*)
 
+print*, "*** Running EcoSLIM ***"
+print*, "Run Name: ", runname
+print*, "ParFlow Run Name: ", pname
+print*, "See ", trim(runname)//'_log.txt', " for more information"
 ! read domain number of cells and number of particles to be injected
 read(10,*) nx
 read(10,*) ny
@@ -663,6 +668,11 @@ else
     write(11,*)  'Did not find PSourceBool line in slimin.txt. Setting boolfile = False'
 end if 
 
+! hard wiring velfile and boolfile for now, could not get the above logic to work properly
+    velfile = .FALSE.
+    boolfile = .FALSE.
+
+
 
 ! end of SLIM input
 close(10)
@@ -682,7 +692,6 @@ Zmax = 0.0d0
 do k = 1, nz
         Zmax = Zmax + dz(k)
 end do
-print*, Zmax
 
 DEM = 0.0d0
 ! read in DEM
@@ -1050,7 +1059,7 @@ if (mod((kk-1),(pft2-pft1+1)) == 0 )  pfkk = pft1 - 1
 
         ! Read the velocities computed by ParFlow
         write(filenum,'(i5.5)') pfkk
-        
+        print*, 'Reading ParFlow output files'
         fname=trim(adjustl(pname))//'.out.velx.'//trim(adjustl(filenum))//'.pfb'
         call pfb_read(Vx,fname,nx+1,ny,nz)
         print*, 'Reading:',fname
@@ -1295,10 +1304,10 @@ if (mod((kk-1),(pft2-pft1+1)) == 0 )  pfkk = pft1 - 1
 ! loop over active particles
 !$OMP DO
         do ii = 1, np_active
-        if(abs(float(ii)/float(np_active)-0.2)<1.d0/float(np_active))  print*, '20% done particle',ii,'of',np_active
-        if(abs(float(ii)/float(np_active)-0.4)<1.d0/float(np_active))  print*, '40% done particle',ii,'of',np_active
-        if(abs(float(ii)/float(np_active)-0.6)<1.d0/float(np_active)) print*, '60% done particle',ii,'of',np_active
-        if(abs(float(ii)/float(np_active)-0.8)<1.d0/float(np_active))  print*, '80% done particle',ii,'of',np_active
+        if(abs(float(ii)/float(np_active)-0.2d0)<1.d0/float(np_active))  print*, '20% done particle',ii,'of',np_active
+        if(abs(float(ii)/float(np_active)-0.4d0)<1.d0/float(np_active))  print*, '40% done particle',ii,'of',np_active
+        if(abs(float(ii)/float(np_active)-0.6d0)<1.d0/float(np_active)) print*, '60% done particle',ii,'of',np_active
+        if(abs(float(ii)/float(np_active)-0.8d0)<1.d0/float(np_active))  print*, '80% done particle',ii,'of',np_active
 
         !do ii = 1, 2
           delta_time = 0.0d0
@@ -2027,6 +2036,7 @@ IO_time_write = IO_time_write + (T2-T1)
         write(11,*)
         ! close the log file
         close(11)
+        print*, '*** EcoSLIM Finished ***'
    end program EcoSLIM
    !
 !-----------------------------------------------------------------------
