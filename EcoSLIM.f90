@@ -11,7 +11,7 @@
 ! Developed by: Reed Maxwell-August 2016, updated October 2024 (reedmaxwell@princeton.edu)
 !
 !
-! Contributors: Laura Condon (lecondon@email.arizona.edu)
+! Contributors: Laura Condon (lecondon@arizona.edu)
 !               Mohammad Danesh-Yazdi (danesh@sharif.edu)
 !               Lindsay Bearup (lbearup@usbr.gov)
 !               Zach Perzan (zperzan@stanford.edu)
@@ -146,7 +146,7 @@ real*8,allocatable::Porosity(:,:,:)      ! Porosity (read from ParFlow)
 real*8,allocatable::EvapTrans(:,:,:)     ! CLM EvapTrans (read from ParFlow, [1/T] units)
 real*8,allocatable::CLMvars(:,:,:)     ! CLM Output (read from ParFlow, following single file
                                        ! CLM output as specified in the manual)
-real*8,allocatable::Pnts(:,:), DEM(:,:), streams(:,:), mask(:,:)   ! DEM, stream mask, and grid points for concentration output
+real*8,allocatable::Pnts(:,:), DEM(:,:), streams(:,:), mask(:,:), particlemask(:,:)   ! DEM, stream mask, and grid points for concentration output
 real*8,allocatable::Ind(:,:,:)            ! Flowpath indicator file
 real*8,allocatable::BoundFlux(:,:,:)         ! An array of flux across each domain boundary
 real*8,allocatable::PSourceBool(:,:,:)       ! Boolean particle source file
@@ -202,7 +202,7 @@ integer itime_loc
         ! Local indices / counters
 integer*4 ir
 
-character*200 runname, filenum, filenumout, pname, fname, vtk_file, DEMname, Indname, Boolname, StreamName
+character*200 runname, filenum, filenumout, pname, fname, vtk_file, DEMname, Indname, Boolname, StreamName, maskfile, particlesfile
         ! runname = SLIM runname
         ! filenum = ParFlow file number
         ! filenumout = File number for Ecoslim writing
@@ -469,7 +469,7 @@ nzclm = 13+nCLMsoil ! CLM output is 13+nCLMsoil layers for different variables n
 n_constituents = 9
 !allocate arrays
 allocate(PInLoc(np,3))
-allocate(Sx(nx,ny),Sy(nx,ny), DEM(nx,ny),streams(nx,ny),mask(nx,ny))
+allocate(Sx(nx,ny),Sy(nx,ny), DEM(nx,ny),streams(nx,ny),mask(nx,ny),particlemask(nx,ny))
 allocate(dz(nz), Zt(0:nz))
 allocate(Vx(nnx,ny,nz), Vy(nx,nny,nz), Vz(nx,ny,nnz))
 allocate(Saturation(nx,ny,nz), Porosity(nx,ny,nz),EvapTrans(nx,ny,nz), Ind(nx,ny,nz), BoundFlux(nx,ny,nz))
@@ -672,7 +672,12 @@ end if
     velfile = .FALSE.
     boolfile = .FALSE.
 
-
+read(10,*) maskfile
+write(11,*) 'Reading mask file:',maskfile
+read(10,*) StreamName
+write(11,*) 'Reading stream file:',StreamName
+read(10,*) particlesfile
+write(11,*) 'Reading particle file:',particlesfile
 
 ! end of SLIM input
 close(10)
@@ -702,7 +707,7 @@ end if ! DEM
 
 streams = 0.0d0
 ! hard wire streams for now
-StreamName = 'streams.pfb'
+!StreamName = 'streams.pfb'
 ! read in streams
 if (StreamName /= '') then
  fname = trim(adjustl(StreamName))
@@ -711,11 +716,22 @@ end if ! streams
 
 mask = 0.0d0
 ! hard wire mask for now
-StreamName = 'mask.pfb'
+!StreamName = 'mask.pfb'
+!maskfile = 'mask.pfb'
 ! read in mask
-if (StreamName /= '') then
- fname = trim(adjustl(StreamName))
+if (maskfile /= '') then
+ fname = trim(adjustl(maskfile))
  call pfb_read(mask,fname,nx,ny,nztemp)
+end if ! mask
+
+particlemask = 0.0d0
+! hard wire mask for now
+!StreamName = 'mask.pfb'
+!maskfile = 'mask.pfb'
+! read in mask
+if (particlesfile /= '') then
+ fname = trim(adjustl(particlesfile))
+ call pfb_read(particlemask,fname,nx,ny,nztemp)
 end if ! mask
 
 Ind = 1.0d0
@@ -936,7 +952,8 @@ do j = 1, ny
 k = nz
   if (np_active < np) then   ! check if we have particles left
   !if (saturation(i,j,k-1) >= 0.95d0)  then
-  if ((streams(i,j) == 1.0).and.(mask(i,j)==1.0))  then
+  !if ((streams(i,j) == 1.0).and.(mask(i,j)==1.0))  then
+  if ((particlemask(i,j) == 1.0).and.(mask(i,j)==1.0))  then
   do ij = 1, abs(np_ic)
   np_active = np_active + 1
   pid = pid +1
