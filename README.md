@@ -9,3 +9,4 @@ This workflow contains Juypyter notebooks for using [SubsetTools](https://hydrof
 5. build a custom version of EcoSLIM with the `EcoSLIM.f90` file provided here.  This workflow will not work with the default version of EcoSLIM
 6. then use the workbook `run_EcoSLIM.0205.dist.ipynb` to run EcoSLIM and analyze the output.  Some sample analysis cells are provided.
 7. the workbook `Read_wells_convert_CONS2_inputs.0205.dist.ipynb` is an example of how to turn the EOG wells database into a EcoSLIM input file for CONUS2, HUC0205
+8. the workbook `uog_run_EcoSLIM.0205.dist.ipynb` will then use this mask file (generated in 7) to run EcoSLIM forward from the wells to the nearest stream
